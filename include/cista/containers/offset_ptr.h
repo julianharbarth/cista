@@ -28,7 +28,7 @@ inline offset_t to_offset(void const* ptr) {
 template <typename T, typename Enable = void>
 struct offset_ptr {
   offset_ptr() noexcept = default;
-  offset_ptr(std::nullptr_t) noexcept : offset_{NULLPTR_OFFSET} {}
+  constexpr offset_ptr(std::nullptr_t) noexcept : offset_{NULLPTR_OFFSET} {}
   offset_ptr(T const* p) noexcept : offset_{ptr_to_offset(p)} {}
 
   offset_ptr& operator=(T const* p) noexcept {
@@ -40,7 +40,8 @@ struct offset_ptr {
     return *this;
   }
 
-  offset_ptr(offset_ptr const& o) noexcept : offset_{ptr_to_offset(o.get())} {}
+  constexpr offset_ptr(offset_ptr const& o) noexcept
+      : offset_{ptr_to_offset(o.get())} {}
   offset_ptr(offset_ptr&& o) noexcept : offset_{ptr_to_offset(o.get())} {}
   offset_ptr& operator=(offset_ptr const& o) noexcept {
     offset_ = ptr_to_offset(o.get());
@@ -53,7 +54,7 @@ struct offset_ptr {
 
   ~offset_ptr() noexcept = default;
 
-  offset_t ptr_to_offset(T const* p) const noexcept {
+  constexpr offset_t ptr_to_offset(T const* p) const noexcept {
     return p == nullptr ? NULLPTR_OFFSET
                         : static_cast<offset_t>(to_offset(p) - to_offset(this));
   }
@@ -66,7 +67,7 @@ struct offset_ptr {
   T* operator->() const noexcept { return get(); }
   T& operator[](size_t const i) const noexcept { return get()[i]; }
 
-  T* get() const noexcept {
+  constexpr T* get() const noexcept {
     auto const ptr =
         offset_ == NULLPTR_OFFSET
             ? nullptr
